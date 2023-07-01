@@ -45,6 +45,10 @@ lose_label = label.render('Ты проиграл :(', False, (0, 0, 0))
 restart_label = label.render('Продолжить?', False, (0, 0, 0))
 restart_labelRect = restart_label.get_rect(topleft=(70, 100))
 
+bulletsLeft = 5
+bullet = pygame.image.load('resources/bullet.png')
+bullet = pygame.transform.scale(bullet, (25, 25))
+bullets = []
 gameplay = True
 
 enemyig = []
@@ -105,6 +109,21 @@ while running:
         bg_x -= 2
         if bg_x == -400:
             bg_x = 0
+
+
+        if bullets:
+            for (i, el) in enumerate(bullets):
+                screen.blit(bullet, (el.x, el.y))
+                el.x += 5
+
+                if el.x > 410:
+                    bullets.pop(i)
+
+                if enemyig:
+                    for (index, enemyEL) in enumerate(enemyig):
+                        if el.colliderect(enemyEL):
+                            enemyig.pop(index)
+                            bullets.pop(i)
     else:
         screen.fill((255, 255, 255))
         screen.blit(lose_label, (70, 50))
@@ -115,6 +134,8 @@ while running:
             gameplay = True
             player_x = 150
             enemyig.clear()
+            bullets.clear()
+            bulletsLeft = 5
 
     pygame.display.update()
 
@@ -124,5 +145,8 @@ while running:
             pygame.quit()
         if event.type == enemyTime:
             enemyig.append(enemy.get_rect(topleft=(410, 130)))
+        if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and bulletsLeft > 0:
+            bullets.append(bullet.get_rect(topleft=(player_x + 30, player_y + 10)))
+            bulletsLeft -= 1
 
     clock.tick(10)
